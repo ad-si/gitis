@@ -13,7 +13,7 @@ A git-backed and YAML-based distributed issue tracker.
 ## Competitors
 
 Name | Git Based | Own Branch | Storage format | CLI | UI | License
----|---|---
+---|---|---|---|---|---|---
 [t](https://github.com/sjl/t) | | | `txt` | `t` | | X11
 [beastie](https://github.com/avillafiorita/beastie) | | | `YAML` | `beastie` | | MIT
 [gaskit](https://github.com/bkeepers/gaskit) | ✔︎ | ✔︎ | ? | | ✔︎ | GPL
