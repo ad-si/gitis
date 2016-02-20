@@ -3,20 +3,45 @@ import path from 'path'
 import fsp from 'fs-promise'
 import yaml from 'js-yaml'
 import nconf from 'nconf'
+import yargs from 'yargs'
+
+const cliOptions = {
+	sortBy: {
+		default: 'number'
+	},
+	sortOrder: {
+		default: 'ascending',
+		choices: ['ascending', 'descending']
+	},
+	state: {
+		default: 'open',
+		choices: ['open', 'closed']
+	},
+	help: {
+		alias: 'h'
+	}
+}
+
+const argv = yargs
+	.usage('Usage: $0 <project-directory>')
+	.version()
+	.options(cliOptions)
+	.help()
+	.argv
 
 nconf
-	.argv()
+	.argv(cliOptions)
 	.env()
 	.file(path.join(process.cwd(), '.gitisrc'))
-	.defaults({
-		sortBy: 'number',
-		sortOrder: 'ascending',
-		filter: {
-			state: 'open'
-		}
-	})
 
-let issuesPath = path.join(process.cwd(), 'issues')
+const issuesPath = path.join(path.resolve(argv._[0] || '.'), 'issues')
+
+const filters = [
+	{
+		name: 'state',
+		value: nconf.get('state')
+	}
+]
 
 fsp
 	.readdir(issuesPath)
@@ -38,15 +63,10 @@ fsp
 						)
 						return json
 					})
-					.filter(issue => {
-						let filter = nconf.get('filter')
-
-						for (let filterName in filter) {
-							if (issue[filterName] !== filter[filterName])
-								return false
-						}
-						return true
-					})
+					.filter(issue =>
+						filters.every(filter =>
+							issue[filter.name] === filter.value)
+					)
 					.sort((issueA, issueB) => {
 						let sortBy = nconf.get('sortBy')
 						let sortOrder = nconf.get('sortOrder')
