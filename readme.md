@@ -10,7 +10,34 @@ A git-backed and YAML-based distributed issue tracker.
 - You should be able to view and edit issues offline
 
 
-## Competitors
+## Schema
+
+```yaml
+title: Use Gitis instead of GitHub issues
+user: adius
+tags:
+  - must_have
+  - important
+  - easy_to_implement
+state: open
+assignee: everyone
+comments:
+  - user: octocat
+    body: Great idea!
+    created_at: 2015-01-12 14:45:21
+  - user: offlineJoe
+    body: Can't wait for it!
+    created_at: 2015-01-12 14:51:34
+milestone: finally_independent
+created_at: 2015-01-12 13:44:46
+updated_at: 2015-01-12 13:46:12
+closed_at: null
+body: |
+  Our issues should be managed with Gitis and not with GitHub Issues
+```
+
+
+## Related
 
 Name | Git Based | Own Branch | Storage format | CLI | UI | License
 ---|---|---|---|---|---|---
