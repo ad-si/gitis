@@ -61,6 +61,7 @@ fsp
 							filePaths[index],
 							path.extname(filePaths[index])
 						)
+						json.state = json.state || 'open'
 						return json
 					})
 					.filter(issue =>
