@@ -1,0 +1,6 @@
+title: Add feature to list dependencies in issues
+body: |
+  This makes milestones obsolete.
+  An milestone is then just an issue
+  which is resolved when all its dependencies
+  are resolved.
