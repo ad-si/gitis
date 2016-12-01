@@ -4,104 +4,104 @@ import fsp from 'fs-promise'
 import yaml from 'js-yaml'
 import nconf from 'nconf'
 import yargs from 'yargs'
+import momentFromString from '@datatypes/moment'
+import loadIssuesFirst from './loadIssuesFirst'
+import logIssue from './logIssue'
+
 
 const cliOptions = {
-	sortBy: {
-		default: 'number'
-	},
-	sortOrder: {
-		default: 'ascending',
-		choices: ['ascending', 'descending']
-	},
-	state: {
-		default: 'open',
-		choices: ['open', 'closed']
-	},
-	help: {
-		alias: 'h'
-	}
+  sortBy: {
+    default: 'datetime',
+  },
+  sortOrder: {
+    default: 'ascending',
+    choices: ['ascending', 'descending'],
+  },
+  state: {
+    default: 'open',
+    choices: ['open', 'closed'],
+  },
+  help: {
+    alias: 'h',
+  },
 }
 
-const argv = yargs
-	.usage('Usage: $0 <project-directory>')
-	.version()
-	.options(cliOptions)
-	.help()
-	.argv
 
-nconf
-	.argv(cliOptions)
-	.env()
-	.file(path.join(process.cwd(), '.gitisrc'))
 
-const issuesPath = path.join(path.resolve(argv._[0] || '.'), 'issues')
+export default (cliArguments) => {
+  const options = yargs
+    .usage('Usage: $0 <project-directory>')
+    .version()
+    .options(cliOptions)
+    .help()
+    .parse(cliArguments)
 
-const filters = [
-	{
-		name: 'state',
-		value: nconf.get('state')
-	}
-]
+  nconf
+    .argv(cliOptions)
+    .env()
+    .file(path.join(process.cwd(), '.gitisrc'))
 
-fsp
-	.readdir(issuesPath)
-	.then(filePaths => {
+  const issuesPath = path.join(
+    options._[0]
+      ? path.resolve(options._[0])
+      : process.cwd(),
+    'issues'
+  )
+  const filters = [
+    {
+      name: 'state',
+      value: nconf.get('state'),
+    },
+  ]
 
-		filePaths = filePaths.filter(filePath => /\.yaml$/.test(filePath))
+  return fsp
+    .readdir(issuesPath)
+    .then(filePaths => filePaths.filter(filePath => /\.yaml$/.test(filePath)))
+    .then(yamlFiles => {
+      const filePromises = yamlFiles
+        .map(filePath => fsp
+          .readFile(path.join(issuesPath, filePath), 'utf8')
+          .then(fileContent => ({
+            path: filePath,
+            content: fileContent,
+          }))
+        )
 
-		return Promise
-			.all(filePaths.map(filePath =>
-				fsp.readFile(path.join(issuesPath, filePath), 'utf8')
-			))
-			.then(files => {
-				files
-					.map(file => yaml.safeLoad(file))
-					.map((json, index) => {
-						json.number = path.basename(
-							filePaths[index],
-							path.extname(filePaths[index])
-						)
-						json.state = json.state || 'open'
-						return json
-					})
-					.filter(issue =>
-						filters.every(filter =>
-							issue[filter.name] === filter.value)
-					)
-					.sort((issueA, issueB) => {
-						let sortBy = nconf.get('sortBy')
-						let sortOrder = nconf.get('sortOrder')
-						let sortValueA = issueA[sortBy]
-						let sortValueB = issueB[sortBy]
-						let value
+      if (options.state) {
+        return loadIssuesFirst({
+          filePromises,
+          filters,
+          sortBy: nconf.get('sortBy'),
+          sortOrder: nconf.get('sortOrder'),
+        })
+      }
+      else {
+        return filePromises.reduce(
+          (promiseChain, filePromise, fileIndex) => {
+            return promiseChain
+              .then(() => filePromise)
+              .then(file => {
+                const issueJson = yaml.safeLoad(file.content)
 
-						if (typeof sortValueA === 'number') {
-							if (typeof sortValueB !== 'number')
-								sortValueB = Number(sortValueB)
-							else
-								value = sortValueA - sortValueB
-						}
-						else {
-							if (typeof sortValueB === 'number')
-								sortValueA = Number(sortValueA)
-							else
-								value = sortValueA.localeCompare(sortValueB)
-						}
+                issueJson.datetime = momentFromString(path.basename(
+                  yamlFiles[fileIndex],
+                  path.extname(yamlFiles[fileIndex])
+                ))
+                if (!issueJson.state) issueJson.state = 'open'
 
-						if (sortOrder === 'ascending')
-							return value
-						else if (sortOrder === 'descending')
-							return -value
-						else
-							throw new Error(
-								sortOrder + ' is no supported sorting order'
-							)
-					})
-					.forEach(json =>
-						console.log(json.number + ': ' + json.title)
-					)
-			})
-	})
-	.catch(error => {
-		console.error(error.stack)
-	})
+                const isFilteredOut = filters.some(
+                  filter => issueJson[filter.name] !== filter.value
+                )
+
+                if (!isFilteredOut) logIssue(issueJson)
+              })
+          },
+          Promise.resolve()
+        )
+      }
+    })
+    .catch(error => {
+      // eslint-disable-next-line no-console
+      console.error(error.stack)
+    })
+}

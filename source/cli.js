@@ -1,3 +1,5 @@
 #! /usr/bin/env node
 
-import gitis from './index'
+const gitis = require('../build')
+
+gitis.default(process.argv.slice(2))

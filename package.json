@@ -2,7 +2,7 @@
   "name": "gitis",
   "version": "0.0.0",
   "description": "A git-backed and YAML-based distributed issue tracker.",
-  "main": "build/index.js",
+  "main": "source/index.js",
   "bin": {
     "gitis": "build/cli.js",
     "gitis-dev": "source/cli-dev.js"
@@ -13,9 +13,10 @@
     "issues": "issues"
   },
   "scripts": {
-    "test": "babel-node source/index.js",
+    "lint": "eslint --ignore-path .gitignore .",
     "build": "babel -d build source",
-    "prepublish": "npm run build"
+    "test": "npm run lint && babel-node tests/main.js && npm run build",
+    "prepublish": "npm test"
   },
   "repository": {
     "type": "git",
@@ -44,5 +45,9 @@
     "babel-preset-latest": "^6.16.0",
     "babel-register": "^6.18.0",
     "javascript-styleguide": "^1.0.0"
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": "./node_modules/javascript-styleguide/.eslintrc.yaml"
   }
 }
