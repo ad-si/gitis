@@ -46,4 +46,5 @@ Name | Git Based | Own Branch | Storage format | CLI | UI | License
 [gaskit](https://github.com/bkeepers/gaskit) | ✔︎ | ✔︎ | ? | | ✔︎ | GPL
 [gitissius](https://github.com/glogiotatidis/gitissius) | ✔︎ | ✔︎ | `JSON` | ✔︎ | | GPLv3
 [bugseverywhere](http://bugseverywhere.org/) | ✔︎ | ? | ? | ✔︎ | ✔︎ | GPLv2
+[gi](https://github.com/dspinellis/gi) | ✔︎ | ✔︎ | `txt` | ✔︎ | | GPLv3
 [gitis](https://github.com/adius/gitis) | ✔︎ | | `YAML` | ✔︎ | ✔︎ | MIT
