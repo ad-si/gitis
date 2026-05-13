@@ -10,6 +10,54 @@ A git-backed and YAML-based distributed issue tracker.
 - You should be able to view and edit issues offline
 
 
+## Installation
+
+```sh
+npm install -g gitis
+```
+
+
+## Usage
+
+Issues are stored as YAML files inside an `issues/` directory at the root of
+your project. The filename is used as the issue's timestamp/id
+(e.g. `2016-05-31T0759.yaml`).
+
+List issues in the current directory:
+
+```sh
+gitis
+```
+
+List issues in a specific project directory:
+
+```sh
+gitis path/to/project
+```
+
+### Options
+
+| Option         | Default      | Description                              |
+| -------------- | ------------ | ---------------------------------------- |
+| `--state`      | `open`       | Filter by state: `open` or `closed`      |
+| `--sortBy`     | `datetime`   | Field to sort issues by                  |
+| `--sortOrder`  | `ascending`  | Sort order: `ascending` or `descending`  |
+| `--help`, `-h` |              | Show help                                |
+| `--version`    |              | Show version                             |
+
+Examples:
+
+```sh
+gitis --state closed
+gitis --sortOrder descending
+```
+
+### Configuration
+
+Defaults can be set per-project via a `.gitisrc` file (JSON) in the project
+root, or via environment variables.
+
+
 ## Schema
 
 ```yaml
