@@ -50,28 +50,19 @@ export default async function loadIssuesFirst(
       const issueA = fileA.issue!
       const issueB = fileB.issue!
 
-      let sortValueA = issueA[sortBy] as number | string
-      let sortValueB = issueB[sortBy] as number | string
-      let value: number | undefined
+      const rawA = issueA[sortBy]
+      const rawB = issueB[sortBy]
+      let value: number
 
-      if (typeof sortValueA === 'number') {
-        if (typeof sortValueB !== 'number') {
-          sortValueB = Number(sortValueB)
-        }
-        else {
-          value = sortValueA - sortValueB
-        }
+      if (rawA instanceof Date && rawB instanceof Date) {
+        value = rawA.getTime() - rawB.getTime()
+      }
+      else if (typeof rawA === 'number' && typeof rawB === 'number') {
+        value = rawA - rawB
       }
       else {
-        if (typeof sortValueB === 'number') {
-          sortValueA = Number(sortValueA)
-        }
-        else {
-          value = String(sortValueA).localeCompare(String(sortValueB))
-        }
+        value = String(rawA).localeCompare(String(rawB))
       }
-
-      if (value === undefined) return 0
 
       if (sortOrder === 'ascending') {
         return value
