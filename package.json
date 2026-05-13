@@ -2,21 +2,25 @@
   "name": "gitis",
   "version": "0.0.0",
   "description": "A git-backed and YAML-based distributed issue tracker.",
-  "main": "source/index.js",
+  "type": "module",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
   "bin": {
-    "gitis": "build/cli.js",
-    "gitis-dev": "source/cli-dev.js"
+    "gitis": "build/cli.js"
   },
+  "files": [
+    "build"
+  ],
   "directories": {
     "test": "tests",
     "lib": "source",
     "issues": "issues"
   },
   "scripts": {
-    "lint": "eslint --ignore-path .gitignore .",
-    "build": "babel -d build source",
-    "test": "npm run lint && babel-node tests/main.js && npm run build",
-    "prepublish": "npm test"
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -34,20 +38,15 @@
   },
   "homepage": "https://github.com/adius/gitis#readme",
   "dependencies": {
-    "@datatypes/moment": "^0.8.0",
-    "fs-promise": "^1.0.0",
-    "js-yaml": "^3.7.0",
-    "nconf": "^0.8.4",
-    "yargs": "^6.4.0"
+    "js-yaml": "^4.1.0",
+    "nconf": "^0.12.1",
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
-    "babel-cli": "^6.18.0",
-    "babel-preset-latest": "^6.16.0",
-    "babel-register": "^6.18.0",
-    "javascript-styleguide": "^1.0.0"
-  },
-  "eslintConfig": {
-    "root": true,
-    "extends": "./node_modules/javascript-styleguide/.eslintrc.yaml"
+    "@types/js-yaml": "^4.0.9",
+    "@types/nconf": "^0.10.7",
+    "@types/node": "^20.11.0",
+    "@types/yargs": "^17.0.32",
+    "typescript": "^5.4.0"
   }
 }
